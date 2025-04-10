@@ -17,6 +17,7 @@ import { MouseEvent, useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { alpha, InputBase, styled } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import FileUploadDialog from '../../ui/FileUploadDialog';
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -61,6 +62,13 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const Navbar = () => {
+    const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
+
+    const handleUploadOpen = () => {
+        setIsUploadOpen(true);
+    }
+
+    console.log(isUploadOpen);
 
     return (
         <AppBar position="static">
@@ -103,6 +111,7 @@ const Navbar = () => {
 
 
                     <Button
+                        onClick={handleUploadOpen}
                         variant="outlined"
                         sx={{
                             color: '#f3f3f3',
@@ -123,6 +132,9 @@ const Navbar = () => {
                             Upload Files
                         </Typography>
                     </Button>
+
+
+                    {isUploadOpen && <FileUploadDialog open={isUploadOpen} setOpen={setIsUploadOpen} />}
                 </Toolbar>
             </Container>
         </AppBar >
