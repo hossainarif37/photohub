@@ -1,15 +1,24 @@
 "use client";
 
 import { useUpload } from "@/providers/UploadProvider";
-import { Box, Container, Modal, Typography } from "@mui/material";
-import Image from "next/image";
-import { Suspense, useEffect, useState } from "react";
-import ImageSkeleton from "./components/ui/ImageSkeleton";
+import {
+  Box,
+  Button,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import ImageCard from "./components/ui/ImageCard";
 
 const HomePage = () => {
   const [uploadedItems, setUploadedItems] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
   const { isUploaded } = useUpload();
 
   useEffect(() => {
@@ -25,11 +34,35 @@ const HomePage = () => {
     setSelectedImage(null);
   };
 
-  console.log('IsUpload', isUploaded);
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleConfirmDelete = () => {
+    localStorage.removeItem("photoHubData");
+    setUploadedItems([]);
+    setOpenDialog(false);
+  };
 
   return (
     <Container>
       <Box sx={{ p: 2 }}>
+        {uploadedItems.length > 0 && (
+          <Box sx={{ mb: 2, textAlign: "right" }}>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleOpenDialog}
+            >
+              Delete All Images
+            </Button>
+          </Box>
+        )}
+
         <Box
           sx={{
             display: "grid",
@@ -37,13 +70,30 @@ const HomePage = () => {
             gap: 4,
           }}
         >
-
           {uploadedItems.map((item, index) => (
             <ImageCard key={index} item={item} onClick={handleImageClick} />
           ))}
-
         </Box>
       </Box>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete all uploaded images? This action
+            cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Delete All
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };
