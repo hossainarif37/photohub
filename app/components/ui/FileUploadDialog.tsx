@@ -157,14 +157,21 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
             const uploadPromises = selectedFiles.map((file) => uploadToCloudinary(file));
             const uploadedImageUrls = await Promise.all(uploadPromises);
 
-            // Create individual entries for each image URL
-            const newEntries = uploadedImageUrls.map((url) => ({
-                image: url, // single image in array
-                tags,
-            }));
-
             // Get existing data from localStorage (or initialize empty array)
             const existingData = JSON.parse(localStorage.getItem("photoHubData") || "[]");
+
+
+            // Find the last used ID
+            const lastId = existingData.length > 0
+                ? Math.max(...existingData.map((item: any) => item.id || 0))
+                : 0;
+
+            // Add new entries with incremental IDs
+            const newEntries = uploadedImageUrls.map((url, index) => ({
+                id: lastId + index + 1,
+                image: url,
+                tags,
+            }));
 
             // Push all new entries
             const updatedData = [...existingData, ...newEntries];
