@@ -9,16 +9,59 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ImageCard from "./components/ui/ImageCard";
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl";
+import { styled, alpha } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
+import SearchIcon from '@mui/icons-material/Search';
+
+const Search = styled('div')(({ theme }) => ({
+  position: 'relative',
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: "#ddd",
+  '&:hover': {
+    backgroundColor: "#ddd",
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: '100%',
+  [theme.breakpoints.up('sm')]: {
+    marginLeft: theme.spacing(0),
+    width: 'auto',
+  },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: '100%',
+  position: 'absolute',
+  pointerEvents: 'none',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: 'inherit',
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(2, 2, 2, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create('width'),
+    width: '100%',
+    [theme.breakpoints.up('md')]: {
+      width: '30ch',
+    },
+  },
+}));
 
 const HomePage = () => {
   const [uploadedItems, setUploadedItems] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [searchText, setSearchText] = useState(""); // ✅ State to hold search query
   const { isUploaded } = useUpload();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,10 +74,6 @@ const HomePage = () => {
     setSelectedImage(url);
   };
 
-  const handleCloseModal = () => {
-    setSelectedImage(null);
-  };
-
   const handleOpenDialog = () => {
     setOpenDialog(true);
   };
@@ -45,25 +84,18 @@ const HomePage = () => {
 
   const handleConfirmDelete = async () => {
     setIsLoading(true);
-    // Retrieve the data from localStorage
     const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
-
-    // Extract the public IDs from the image URLs
     const publicIds = data
       .map((item: any) => getPublicIdFromUrl(item.image))
       .filter(Boolean);
 
     try {
-      // Make API call to delete images from Cloudinary
       await fetch("/api/deleteAllImages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ publicIds }),
       });
 
-      // Clear the localStorage and reset state
       localStorage.removeItem("photoHubData");
       setUploadedItems([]);
       setOpenDialog(false);
@@ -74,23 +106,16 @@ const HomePage = () => {
     }
   };
 
-  // New function to handle single image deletion
   const handleDeleteSingleImage = async (publicId: string) => {
     try {
-      // Make API call to delete a single image from Cloudinary
       const response = await fetch("/api/deleteSingleImage", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ publicId }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete image");
-      }
+      if (!response.ok) throw new Error("Failed to delete image");
 
-      // Update local storage and state
       const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
       const updatedData = data.filter(
         (item: any) => getPublicIdFromUrl(item.image) !== publicId
@@ -102,16 +127,31 @@ const HomePage = () => {
     }
   };
 
+  // ✅ Filter images based on search text and tags
+  const filteredItems = uploadedItems.filter((item) =>
+    item.tags?.some((tag: string) =>
+      tag.toLowerCase().includes(searchText.toLowerCase())
+    )
+  );
+
   return (
     <Container>
       <Box sx={{ p: 2 }}>
         {uploadedItems.length > 0 && (
-          <Box sx={{ mb: 2, textAlign: "right" }}>
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleOpenDialog}
-            >
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+            <Search>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ 'aria-label': 'search' }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
+            </Search>
+
+            <Button variant="contained" color="error" onClick={handleOpenDialog}>
               Delete All Images
             </Button>
           </Box>
@@ -124,7 +164,7 @@ const HomePage = () => {
             gap: 4,
           }}
         >
-          {uploadedItems.map((item, index) => (
+          {(searchText ? filteredItems : uploadedItems).map((item, index) => (
             <ImageCard
               key={index}
               item={item}
@@ -135,7 +175,6 @@ const HomePage = () => {
         </Box>
       </Box>
 
-      {/* Confirmation Dialog for Delete All */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
@@ -148,7 +187,12 @@ const HomePage = () => {
           <Button onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
-          <Button disabled={isLoading} onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button
+            disabled={isLoading}
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
             Delete All
           </Button>
         </DialogActions>
