@@ -36,7 +36,7 @@ const ImageCard = ({ item, onClick }: { item: any; onClick: (url: string) => voi
                     onLoad={() => setLoaded(true)}
                 />
             </Box>
-            <Box sx={{ display: "flex", gap: 1, mt: 1, padding: "0 10px", justifyContent: "center" }}>
+            <Box sx={{ display: "flex", gap: 1, mt: 1, padding: "0 10px" }}>
                 {item.tags.map((tag: string, index: number) => (
                     <Typography
                         key={index}

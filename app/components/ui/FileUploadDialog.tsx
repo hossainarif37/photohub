@@ -130,6 +130,13 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
     const handleSubmit = async () => {
         let isValid = true;
 
+        if (tags.length === 0) {
+            console.log('tagError', tagError);
+            setTagError("Please add at least one tag.");
+            isValid = false;
+        } else {
+            setTagError("");
+        }
         if (selectedFiles.length === 0) {
             setImageError("Please select at least one image.");
             isValid = false;
@@ -137,17 +144,10 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
             setImageError("");
         }
 
-        if (tags.length === 0) {
-            setTagError("Please add at least one tag.");
-            isValid = false;
-        } else {
-            setTagError("");
-        }
 
         if (tagError) {
+            console.log(149);
             isValid = false;
-        } else {
-            setTagError("");
         }
 
         if (!isValid) return;
@@ -191,6 +191,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
         }
     };
 
+    console.log('tagError', tagError);
 
 
     return (

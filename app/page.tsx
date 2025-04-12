@@ -14,12 +14,14 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ImageCard from "./components/ui/ImageCard";
+import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl";
 
 const HomePage = () => {
   const [uploadedItems, setUploadedItems] = useState<any[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const { isUploaded } = useUpload();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
@@ -42,11 +44,39 @@ const HomePage = () => {
     setOpenDialog(false);
   };
 
-  const handleConfirmDelete = () => {
-    localStorage.removeItem("photoHubData");
-    setUploadedItems([]);
-    setOpenDialog(false);
+
+
+  const handleConfirmDelete = async () => {
+    setIsLoading(true);
+    // Retrieve the data from localStorage
+    const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
+
+    // Extract the public IDs from the image URLs
+    const publicIds = data
+      .map((item: any) => getPublicIdFromUrl(item.image))  // Assuming "image" is the URL
+      .filter(Boolean); // Remove nulls
+
+    try {
+      // Make API call to delete images from Cloudinary
+      await fetch("/api/deleteAllImages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ publicIds }),
+      });
+
+      // Clear the localStorage and reset state
+      localStorage.removeItem("photoHubData");
+      setUploadedItems([]);
+      setOpenDialog(false);
+    } catch (err) {
+      console.error("Failed to delete from Cloudinary:", err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
 
   return (
     <Container>
@@ -89,7 +119,7 @@ const HomePage = () => {
           <Button onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+          <Button disabled={isLoading} onClick={handleConfirmDelete} color="error" variant="contained">
             Delete All
           </Button>
         </DialogActions>
