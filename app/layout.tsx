@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "./components/layout/navbar/Navbar";
+import { UploadProvider } from "@/providers/UploadProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,8 +18,10 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <Navbar />
-        {children}
+        <UploadProvider>
+          <Navbar />
+          {children}
+        </UploadProvider>
       </body>
     </html>
   );

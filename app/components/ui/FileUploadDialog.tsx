@@ -16,8 +16,10 @@ import ImageIcon from "@mui/icons-material/Image";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { styled } from "@mui/material/styles";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
+import { uploadToCloudinary } from "@/api/uploadToCloudinary";
+import { useUpload } from "@/providers/UploadProvider";
 
 type Props = {
     open: boolean;
@@ -36,7 +38,8 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
     const [tags, setTags] = useState<string[]>([]);
     const [imageError, setImageError] = useState("");
     const [tagError, setTagError] = useState("");
-
+    const [isUploading, setIsUploading] = useState(false);
+    const { isUploaded, setIsUploaded } = useUpload();
 
     const handleClose = () => {
         setOpen(false);
@@ -53,7 +56,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
         const files = event.target.files;
         if (files) {
             setSelectedFiles([...selectedFiles, ...Array.from(files)]);
-            setImageError(""); // Clear error on valid input
+            setImageError("");
         }
 
     };
@@ -64,7 +67,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
         const files = event.dataTransfer.files;
         if (files) {
             setSelectedFiles([...selectedFiles, ...Array.from(files)]);
-            setImageError(""); // Clear error on valid input
+            setImageError("");
         }
 
     }, [selectedFiles]);
@@ -78,7 +81,29 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
         setIsDragging(false);
     };
 
+    const handleTagInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (tags.length >= 3) {
+            setTagError("You can add up to 3 tags.");
+            return;
+        } else {
+            setTagError("");
+        }
+
+        if (event.target.value.length >= 13) {
+            setTagError("Tag should be less than 13 characters.");
+            return;
+        } else {
+            setTagError("");
+        }
+
+        setTagInput(event.target.value);
+    };
+
     const handleAddTag = () => {
+        if (tagError) {
+            return;
+        }
+
         const trimmedTag = tagInput.trim();
         if (trimmedTag && !tags.includes(trimmedTag)) {
             setTags([...tags, trimmedTag]);
@@ -102,7 +127,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
         setSelectedFiles([]);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         let isValid = true;
 
         if (selectedFiles.length === 0) {
@@ -119,12 +144,46 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
             setTagError("");
         }
 
+        if (tagError) {
+            isValid = false;
+        } else {
+            setTagError("");
+        }
+
         if (!isValid) return;
 
-        console.log("Uploaded Files:", selectedFiles);
-        console.log("Tags:", tags);
-        handleClose();
+        try {
+            setIsUploading(true);
+            const uploadPromises = selectedFiles.map((file) => uploadToCloudinary(file));
+            const uploadedImageUrls = await Promise.all(uploadPromises);
+
+            // Create individual entries for each image URL
+            const newEntries = uploadedImageUrls.map((url) => ({
+                image: url, // single image in array
+                tags,
+            }));
+
+            // Get existing data from localStorage (or initialize empty array)
+            const existingData = JSON.parse(localStorage.getItem("photoHubData") || "[]");
+
+            // Push all new entries
+            const updatedData = [...existingData, ...newEntries];
+
+            // Save updated data to localStorage
+            localStorage.setItem("photoHubData", JSON.stringify(updatedData));
+            setIsUploaded(true);
+
+            handleClose();
+        } catch (error) {
+            console.error("Upload failed:", error);
+        } finally {
+            setIsUploading(false);
+            setTimeout(() => {
+                setIsUploaded(false);
+            }, 2000);
+        }
     };
+
 
 
     return (
@@ -153,14 +212,13 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
                         <ImageIcon fontSize="inherit" />
                     </IconButton>
                     <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
-                        Drag & drop images here
+                        Drag & Drop images here
                     </Typography>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
-                        Drop your images here or click to browse. Supports JPG, PNG, GIF,
-                        and WebP.
+                    <Typography variant="body1" sx={{ mb: 2 }}>
+                        Or
                     </Typography>
                     <Button variant="contained" onClick={handleClick}>
-                        Select Files
+                        Browse
                     </Button>
                     <HiddenInput
                         type="file"
@@ -227,26 +285,29 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
                 )}
 
                 {/* Tags */}
-                <Box display="flex" gap={1} mb={2} mt={3}>
-                    <TextField
-                        fullWidth
-                        variant="outlined"
-                        label="Add Tag"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                                e.preventDefault();
-                                handleAddTag();
-                            }
-                        }}
-                        error={!!tagError}
-                        helperText={tagError}
-                    />
+                <Box>
+                    <Box display="flex" mb={1} gap={1} mt={3}>
+                        <TextField
+                            fullWidth
+                            variant="outlined"
+                            label="Add Tag"
+                            value={tagInput}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTagInputChange(e)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleAddTag();
+                                }
+                            }}
+                            error={!!tagError}
+                        />
 
-                    <Button variant="outlined" onClick={handleAddTag}>
-                        Add
-                    </Button>
+                        <Button variant="outlined" onClick={handleAddTag}>
+                            Add
+                        </Button>
+                    </Box>
+
+                    {tagError && <Typography variant="body2" color="error" sx={{ mb: 1 }}>{tagError}</Typography>}
                 </Box>
 
                 <Box display="flex" flexWrap="wrap" gap={1} mb={2}>
@@ -265,7 +326,12 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
 
             <DialogActions>
                 <Button onClick={handleClose}>Cancel</Button>
-                <Button type="submit" variant="contained" onClick={handleSubmit}>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={isUploading}
+                    onClick={handleSubmit}
+                >
                     Upload
                 </Button>
             </DialogActions>

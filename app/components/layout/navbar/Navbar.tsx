@@ -134,7 +134,14 @@ const Navbar = () => {
                     </Button>
 
 
-                    {isUploadOpen && <FileUploadDialog open={isUploadOpen} setOpen={setIsUploadOpen} />}
+                    {
+                        isUploadOpen && (
+                            <FileUploadDialog
+                                open={isUploadOpen}
+                                setOpen={setIsUploadOpen}
+                            />
+                        )
+                    }
                 </Toolbar>
             </Container>
         </AppBar >
