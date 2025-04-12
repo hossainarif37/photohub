@@ -1,5 +1,4 @@
 "use client";
-
 import { useUpload } from "@/providers/UploadProvider";
 import {
   Box,
@@ -44,8 +43,6 @@ const HomePage = () => {
     setOpenDialog(false);
   };
 
-
-
   const handleConfirmDelete = async () => {
     setIsLoading(true);
     // Retrieve the data from localStorage
@@ -53,8 +50,8 @@ const HomePage = () => {
 
     // Extract the public IDs from the image URLs
     const publicIds = data
-      .map((item: any) => getPublicIdFromUrl(item.image))  // Assuming "image" is the URL
-      .filter(Boolean); // Remove nulls
+      .map((item: any) => getPublicIdFromUrl(item.image))
+      .filter(Boolean);
 
     try {
       // Make API call to delete images from Cloudinary
@@ -77,6 +74,33 @@ const HomePage = () => {
     }
   };
 
+  // New function to handle single image deletion
+  const handleDeleteSingleImage = async (publicId: string) => {
+    try {
+      // Make API call to delete a single image from Cloudinary
+      const response = await fetch("/api/deleteSingleImage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ publicId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete image");
+      }
+
+      // Update local storage and state
+      const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
+      const updatedData = data.filter(
+        (item: any) => getPublicIdFromUrl(item.image) !== publicId
+      );
+      localStorage.setItem("photoHubData", JSON.stringify(updatedData));
+      setUploadedItems(updatedData);
+    } catch (err) {
+      console.error("Failed to delete image:", err);
+    }
+  };
 
   return (
     <Container>
@@ -101,12 +125,17 @@ const HomePage = () => {
           }}
         >
           {uploadedItems.map((item, index) => (
-            <ImageCard key={index} item={item} onClick={handleImageClick} />
+            <ImageCard
+              key={index}
+              item={item}
+              onClick={handleImageClick}
+              onDelete={handleDeleteSingleImage}
+            />
           ))}
         </Box>
       </Box>
 
-      {/* Confirmation Dialog */}
+      {/* Confirmation Dialog for Delete All */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>

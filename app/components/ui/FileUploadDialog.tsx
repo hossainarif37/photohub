@@ -340,7 +340,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
                     disabled={isUploading}
                     onClick={handleSubmit}
                 >
-                    Upload
+                    {isUploading ? "Uploading..." : "Upload"}
                 </Button>
             </DialogActions>
         </Dialog>
