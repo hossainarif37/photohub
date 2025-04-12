@@ -5,6 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
 import { useState } from "react";
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl";
+import CloseIcon from '@mui/icons-material/Close';
 
 const ImageCard = ({
     item,
@@ -19,6 +20,8 @@ const ImageCard = ({
     const [openDialog, setOpenDialog] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
+    const [openImageDialog, setOpenImageDialog] = useState(false);
+
 
     const handleDeleteClick = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent image click event
@@ -55,7 +58,6 @@ const ImageCard = ({
                 backgroundColor: '#fff',
                 position: 'relative'
             }}
-            onClick={() => onClick(item.image)}
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
         >
@@ -67,6 +69,10 @@ const ImageCard = ({
                     cursor: "pointer",
                     borderRadius: 2,
                     overflow: "hidden",
+                }}
+                onClick={() => {
+                    onClick(item.image)
+                    setOpenImageDialog(true)
                 }}
             >
                 {/* Delete Icon - Only visible on hover */}
@@ -145,8 +151,29 @@ const ImageCard = ({
                     </Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+
+            <Dialog open={openImageDialog} onClose={() => setOpenImageDialog(false)} maxWidth="md" fullWidth>
+                <DialogActions>
+                    <Button onClick={() => setOpenImageDialog(false)}>
+                        <CloseIcon />
+                    </Button>
+                </DialogActions>
+                <DialogContent sx={{ position: "relative", p: 0 }}>
+                    <Image
+                        src={item.image}
+                        alt="Large view"
+                        width={1000}
+                        height={600}
+                        style={{ width: "100%", height: "auto", objectFit: "contain" }}
+                    />
+                </DialogContent>
+
+
+            </Dialog>
+
+        </Box >
     );
+
 };
 
 export default ImageCard;
