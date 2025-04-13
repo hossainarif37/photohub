@@ -190,6 +190,7 @@ const HomePage = () => {
               item={item}
               onClick={handleImageClick}
               onDelete={handleDeleteSingleImage}
+              searchText={searchText}
             />
           ))
           }
@@ -216,8 +217,6 @@ const HomePage = () => {
           </Button>
         </Box>
       )}
-
-
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Confirm Deletion</DialogTitle>

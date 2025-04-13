@@ -1,4 +1,3 @@
-// components/ui/ImageCard.tsx
 "use client";
 import { Box, Skeleton, Typography, IconButton, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -10,18 +9,19 @@ import CloseIcon from '@mui/icons-material/Close';
 const ImageCard = ({
     item,
     onClick,
-    onDelete
+    onDelete,
+    searchText
 }: {
     item: any;
     onClick: (url: string) => void;
     onDelete?: (publicId: string) => Promise<void>;
+    searchText: string;
 }) => {
     const [loaded, setLoaded] = useState(false);
     const [openDialog, setOpenDialog] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const [openImageDialog, setOpenImageDialog] = useState(false);
-
 
     const handleDeleteClick = (e: React.MouseEvent) => {
         e.stopPropagation(); // Prevent image click event
@@ -47,6 +47,29 @@ const ImageCard = ({
             setIsDeleting(false);
             setOpenDialog(false);
         }
+    };
+
+    // Function to highlight the matching portion of the tag
+    const renderHighlightedTag = (tag: string) => {
+        if (!searchText) return tag;
+
+        const lowerTag = tag.toLowerCase();
+        const lowerSearch = searchText.toLowerCase();
+
+        if (!lowerTag.includes(lowerSearch)) return tag;
+
+        const startIndex = lowerTag.indexOf(lowerSearch);
+        const endIndex = startIndex + lowerSearch.length;
+
+        return (
+            <>
+                {tag.substring(0, startIndex)}
+                <span style={{ backgroundColor: '#ffff00', color: '#000' }}>
+                    {tag.substring(startIndex, endIndex)}
+                </span>
+                {tag.substring(endIndex)}
+            </>
+        );
     };
 
     return (
@@ -126,7 +149,7 @@ const ImageCard = ({
                             fontSize: "11px",
                         }}
                     >
-                        {tag}
+                        {renderHighlightedTag(tag)}
                     </Typography>
                 ))}
             </Box>
@@ -167,13 +190,9 @@ const ImageCard = ({
                         style={{ width: "100%", height: "auto", objectFit: "contain" }}
                     />
                 </DialogContent>
-
-
             </Dialog>
-
-        </Box >
+        </Box>
     );
-
 };
 
 export default ImageCard;
