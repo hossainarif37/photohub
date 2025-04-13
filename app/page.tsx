@@ -64,6 +64,9 @@ const HomePage = () => {
   const [searchText, setSearchText] = useState(""); // ✅ State to hold search query
   const { isUploaded } = useUpload();
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
+
 
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
@@ -134,9 +137,24 @@ const HomePage = () => {
     )
   );
 
+  const sourceItems = searchText ? filteredItems : uploadedItems;
+  const reversedItems = [...sourceItems].reverse(); // Latest uploads first
+
+  const totalPages = Math.ceil(reversedItems.length / itemsPerPage);
+
+  // Calculate start and end index
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedItems = reversedItems.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText]);
+
+
   return (
-    <Container>
-      <Box sx={{ p: 2 }}>
+    <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box sx={{ p: 2, flexGrow: 1 }}>
         {uploadedItems.length > 0 && (
           <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: "space-between", mb: 2, gap: 2 }}>
             <Search>
@@ -166,16 +184,40 @@ const HomePage = () => {
             gap: 4,
           }}
         >
-          {(searchText ? filteredItems : uploadedItems).map((item, index) => (
+          {paginatedItems.map((item, index) => (
             <ImageCard
               key={index}
               item={item}
               onClick={handleImageClick}
               onDelete={handleDeleteSingleImage}
             />
-          ))}
+          ))
+          }
         </Box>
       </Box>
+
+      {sourceItems.length > itemsPerPage && (
+        <Box sx={{ display: 'flex', justifyContent: 'end', py: 4 }}>
+          <Button
+            variant="outlined"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            sx={{ mx: 1 }}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outlined"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            sx={{ mx: 1 }}
+          >
+            Next
+          </Button>
+        </Box>
+      )}
+
+
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Confirm Deletion</DialogTitle>
