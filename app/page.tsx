@@ -16,13 +16,14 @@ import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl";
 import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: "#ddd",
+  backgroundColor: "#f1f1f1",
   '&:hover': {
-    backgroundColor: "#ddd",
+    backgroundColor: "#f1f1f1",
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -46,7 +47,6 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
   '& .MuiInputBase-input': {
-    padding: theme.spacing(2, 2, 2, 0),
     // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     transition: theme.transitions.create('width'),
@@ -138,12 +138,13 @@ const HomePage = () => {
     <Container>
       <Box sx={{ p: 2 }}>
         {uploadedItems.length > 0 && (
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: "space-between", mb: 2, gap: 2 }}>
             <Search>
-              <SearchIconWrapper>
+              <SearchIconWrapper >
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
+                sx={{ padding: { xs: "2px", md: 1 } }}
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
                 value={searchText}
@@ -151,8 +152,9 @@ const HomePage = () => {
               />
             </Search>
 
-            <Button variant="contained" color="error" onClick={handleOpenDialog}>
-              Delete All Images
+            <Button sx={{ ml: "auto", width: { xs: "50%", md: "auto" }, textTransform: "capitalize" }} variant="contained" color="error" onClick={handleOpenDialog}>
+              <DeleteIcon sx={{ mr: 1 }} />
+              Delete All
             </Button>
           </Box>
         )}

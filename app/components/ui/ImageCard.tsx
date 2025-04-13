@@ -121,8 +121,8 @@ const ImageCard = ({
                             mr: 1,
                             background: "#1976D2",
                             color: "#fff",
-                            padding: "4px",
-                            borderRadius: "4px",
+                            padding: "4px 8px",
+                            borderRadius: "25px",
                             fontSize: "11px",
                         }}
                     >
@@ -158,7 +158,7 @@ const ImageCard = ({
                         <CloseIcon />
                     </Button>
                 </DialogActions>
-                <DialogContent sx={{ position: "relative", p: 0 }}>
+                <DialogContent sx={{ position: "relative", p: 2 }}>
                     <Image
                         src={item.image}
                         alt="Large view"
