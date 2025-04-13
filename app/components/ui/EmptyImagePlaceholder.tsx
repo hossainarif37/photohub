@@ -4,7 +4,9 @@ import React from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
+import SearchIcon from '@mui/icons-material/Search';
 import { useUpload } from '@/providers/UploadProvider';
+import PreviewIcon from '@mui/icons-material/Preview';
 
 const EmptyImagePlaceholder = () => {
     const { setIsUploadOpen } = useUpload();
@@ -36,23 +38,22 @@ const EmptyImagePlaceholder = () => {
 
                         <div className="p-4 sm:p-6 bg-gray-50 rounded-xl">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                                <LocalOfferIcon className="text-purple-500 text-xl" />
+                                <PreviewIcon className="text-purple-500 text-xl" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2">Auto Tagging</h3>
+                            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2">Preview & Delete</h3>
                             <p className="text-sm text-gray-600">
-                                Images are automatically tagged for easy organization
+                                View full-size previews and remove images with confirmation
                             </p>
                         </div>
 
+
                         <div className="p-4 sm:p-6 bg-gray-50 rounded-xl">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-                                </svg>
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                                <SearchIcon className="text-yellow-500 text-xl" />
                             </div>
-                            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2">Share Easily</h3>
+                            <h3 className="font-semibold text-gray-900 mb-1 sm:mb-2">Smart Search</h3>
                             <p className="text-sm text-gray-600">
-                                Share your images with anyone, anywhere
+                                Easily find images with tags and filter by search queries
                             </p>
                         </div>
                     </div>
@@ -65,7 +66,6 @@ const EmptyImagePlaceholder = () => {
                         <CloudUploadIcon className="text-base sm:text-lg" />
                         <span className="truncate">Upload Your First Image</span>
                     </button>
-
                 </div>
             </div>
         </div>
