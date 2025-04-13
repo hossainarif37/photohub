@@ -10,13 +10,10 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { useState } from 'react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import FileUploadDialog from '../../ui/FileUploadDialog';
+import { useUpload } from '@/providers/UploadProvider';
 
 const Navbar = () => {
-    const [isUploadOpen, setIsUploadOpen] = useState<boolean>(false);
-
-    const handleUploadOpen = () => {
-        setIsUploadOpen(true);
-    }
+    const { isUploadOpen, setIsUploadOpen } = useUpload();
 
     return (
         <AppBar position="static">
@@ -45,7 +42,7 @@ const Navbar = () => {
                     </Box>
 
                     <Button
-                        onClick={handleUploadOpen}
+                        onClick={() => setIsUploadOpen(true)}
                         variant="outlined"
                         sx={{
                             color: '#f3f3f3',

@@ -17,6 +17,7 @@ import { styled, alpha } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EmptyImagePlaceholder from "./components/ui/EmptyImagePlaceholder";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -155,7 +156,9 @@ const HomePage = () => {
   return (
     <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box sx={{ p: 2, flexGrow: 1 }}>
-        {uploadedItems.length > 0 && (
+        {uploadedItems.length === 0 ? (
+          <EmptyImagePlaceholder />
+        ) : (
           <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: "space-between", mb: 2, gap: 2 }}>
             <Search>
               <SearchIconWrapper >
