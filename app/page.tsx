@@ -13,11 +13,12 @@ import {
 import { useEffect, useState } from "react";
 import ImageCard from "./components/ui/ImageCard";
 import { getPublicIdFromUrl } from "@/utils/getPublicIdFromUrl";
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmptyImagePlaceholder from "./components/ui/EmptyImagePlaceholder";
+import NoSearchResults from "./components/ui/NoSearchResults";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -162,7 +163,7 @@ const HomePage = () => {
           <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, justifyContent: "space-between", mb: 2, gap: 2 }}>
             <Search>
               <SearchIconWrapper >
-                <SearchIcon />
+                <SearchIcon sx={{ color: "grey.500" }} />
               </SearchIconWrapper>
               <StyledInputBase
                 sx={{ padding: { xs: "2px", md: 1 } }}
@@ -180,24 +181,29 @@ const HomePage = () => {
           </Box>
         )}
 
-        <Box
-          sx={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: 4,
-          }}
-        >
-          {paginatedItems.map((item, index) => (
-            <ImageCard
-              key={index}
-              item={item}
-              onClick={handleImageClick}
-              onDelete={handleDeleteSingleImage}
-              searchText={searchText}
-            />
-          ))
-          }
-        </Box>
+        {paginatedItems.length === 0 ? (
+          <NoSearchResults query={searchText} />
+        ) : (
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+              gap: 4,
+              mt: 5
+            }}
+          >
+            {paginatedItems.map((item, index) => (
+              <ImageCard
+                key={index}
+                item={item}
+                onClick={handleImageClick}
+                onDelete={handleDeleteSingleImage}
+                searchText={searchText}
+              />
+            ))}
+          </Box>
+        )}
+
       </Box>
 
       {sourceItems.length > itemsPerPage && (
