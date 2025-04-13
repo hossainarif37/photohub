@@ -60,7 +60,7 @@ const EmptyImagePlaceholder = () => {
                     <button
                         type="button"
                         onClick={() => setIsUploadOpen(true)}
-                        className="text-sm md:text-base px-5 sm:px-6 py-2.5 sm:py-3 bg-[#1976D2] text-white rounded-lg font-semibold hover:bg-[#1976D3]/90 transition-colors duration-200 inline-flex items-center gap-2 whitespace-nowrap"
+                        className="text-sm md:text-base px-5 sm:px-6 py-2.5 sm:py-3 bg-[#1976D2] text-white rounded-lg font-semibold hover:bg-[#1976D3]/90 hover:cursor-pointer transition-colors duration-200 inline-flex items-center gap-2 whitespace-nowrap"
                     >
                         <CloudUploadIcon className="text-base sm:text-lg" />
                         <span className="truncate">Upload Your First Image</span>

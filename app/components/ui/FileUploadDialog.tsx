@@ -100,7 +100,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
     };
 
     const handleAddTag = () => {
-        if (tagError) {
+        if (tagError === "Please select at least one image.") {
             return;
         }
 
@@ -225,9 +225,16 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
                     <Typography variant="body1" sx={{ mb: 2 }}>
                         Or
                     </Typography>
-                    <Button variant="contained" onClick={handleClick}>
+                    <Button
+                        variant="contained"
+                        onClick={(e) => {
+                            e.stopPropagation(); // prevent bubbling to the Box
+                            handleClick();
+                        }}
+                    >
                         Browse
                     </Button>
+
                     <HiddenInput
                         type="file"
                         accept="image/jpeg,image/png,image/gif,image/webp"
