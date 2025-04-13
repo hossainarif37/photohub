@@ -1,4 +1,3 @@
-// components/ui/NoSearchResults.tsx
 import { Box, Typography } from "@mui/material";
 import SearchOffIcon from '@mui/icons-material/SearchOff';
 
