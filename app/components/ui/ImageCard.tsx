@@ -92,6 +92,7 @@ const ImageCard = ({
                     cursor: "pointer",
                     borderRadius: 2,
                     overflow: "hidden",
+                    padding: 2
                 }}
                 onClick={() => {
                     onClick(item.image)

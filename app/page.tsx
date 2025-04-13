@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Skeleton,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import ImageCard from "./components/ui/ImageCard";
@@ -19,6 +20,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EmptyImagePlaceholder from "./components/ui/EmptyImagePlaceholder";
 import NoSearchResults from "./components/ui/NoSearchResults";
+import HomePageSkeleton from "./components/ui/HomePageSkeleton";
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -66,6 +68,7 @@ const HomePage = () => {
   const [searchText, setSearchText] = useState(""); // ✅ State to hold search query
   const { isUploaded } = useUpload();
   const [isLoading, setIsLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -73,6 +76,7 @@ const HomePage = () => {
   useEffect(() => {
     const data = JSON.parse(localStorage.getItem("photoHubData") || "[]");
     setUploadedItems(data);
+    setInitialLoading(false);
   }, [isUploaded]);
 
   const handleImageClick = (url: string) => {
@@ -153,9 +157,14 @@ const HomePage = () => {
     setCurrentPage(1);
   }, [searchText]);
 
+  if (initialLoading) {
+    return <HomePageSkeleton />;
+  }
+
 
   return (
     <Container sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+
       <Box sx={{ p: 2, flexGrow: 1 }}>
         {uploadedItems.length === 0 ? (
           <EmptyImagePlaceholder />
@@ -205,6 +214,7 @@ const HomePage = () => {
         )}
 
       </Box>
+
 
       {sourceItems.length > itemsPerPage && (
         <Box sx={{ display: 'flex', justifyContent: 'end', py: 4 }}>
