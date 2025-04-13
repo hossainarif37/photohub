@@ -100,7 +100,7 @@ const FileUploadDialog: React.FC<Props> = ({ open, setOpen }) => {
     };
 
     const handleAddTag = () => {
-        if (tagError === "Please select at least one image.") {
+        if (tagError && tagError !== "Please add at least one tag.") {
             return;
         }
 
