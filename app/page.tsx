@@ -190,7 +190,7 @@ const HomePage = () => {
           </Box>
         )}
 
-        {paginatedItems.length === 0 ? (
+        {paginatedItems.length === 0 && searchText ? (
           <NoSearchResults query={searchText} />
         ) : (
           <Box
